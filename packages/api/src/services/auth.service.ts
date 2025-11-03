@@ -1,11 +1,14 @@
-import { PrismaClient } from '../generated/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || 'your-default-secret';
+if (!process.env.JWT_SECRET) {
+  throw new Error('FATAL_ERROR: JWT_SECRET is not defined in the environment variables.');
+}
+const JWT_SECRET = process.env.JWT_SECRET;
 
-// Basic in-memory store for refresh tokens for simplicity
+// WARNING: This is a basic in-memory store for refresh tokens and is not suitable for production.
+// All user sessions will be lost on server restart.
+// Replace with a persistent store like Redis in a real application.
 const tokenStore: { [key: string]: string } = {};
 
 export const AuthService = {
@@ -20,12 +23,12 @@ export const AuthService = {
   },
 
   // Generate JWT Access Token
-  generateAccessToken: (userId: number, email: string): string => {
+  generateAccessToken: (userId: string, email: string): string => {
     return jwt.sign({ userId, email }, JWT_SECRET, { expiresIn: '15m' });
   },
 
   // Generate JWT Refresh Token
-  generateRefreshToken: (userId: number): string => {
+  generateRefreshToken: (userId: string): string => {
     const refreshToken = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' });
     tokenStore[userId] = refreshToken;
     return refreshToken;
@@ -41,7 +44,7 @@ export const AuthService = {
   },
 
   // Invalidate refresh token
-  invalidateRefreshToken: (userId: number) => {
+  invalidateRefreshToken: (userId: string) => {
     delete tokenStore[userId];
   }
 };

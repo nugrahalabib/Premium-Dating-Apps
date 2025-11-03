@@ -1,9 +1,7 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '../generated/prisma';
+import prisma from '../utils/prisma';
 import { AuthService } from '../services/auth.service';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
 
 // Input validation schemas
 const registerSchema = z.object({
@@ -36,7 +34,7 @@ export const AuthController = {
       const user = await prisma.user.create({
         data: {
           email,
-          password: hashedPassword,
+          passwordHash: hashedPassword,
           firstName,
           lastName,
           birthDate: new Date(birthDate),
@@ -62,7 +60,7 @@ export const AuthController = {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
-      const isPasswordValid = await AuthService.comparePassword(password, user.password);
+      const isPasswordValid = await AuthService.comparePassword(password, user.passwordHash);
       if (!isPasswordValid) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }

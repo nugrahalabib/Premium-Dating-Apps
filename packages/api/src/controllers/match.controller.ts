@@ -1,9 +1,7 @@
 import { Response } from 'express';
-import { PrismaClient } from '../generated/prisma';
+import prisma from '../utils/prisma';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
 
 const sendMessageSchema = z.object({
   content: z.string().min(1),
@@ -42,7 +40,7 @@ export const MatchController = {
   sendMessage: async (req: AuthenticatedRequest, res: Response) => {
     try {
       const senderId = req.user?.userId;
-      const matchId = parseInt(req.params.matchId, 10);
+      const { matchId } = req.params;
       const { content } = sendMessageSchema.parse(req.body);
 
       // Verify the user is part of the match
@@ -93,7 +91,7 @@ export const MatchController = {
   unmatch: async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.userId;
-      const matchId = parseInt(req.params.matchId, 10);
+      const { matchId } = req.params;
 
        const match = await prisma.match.findFirst({
         where: {

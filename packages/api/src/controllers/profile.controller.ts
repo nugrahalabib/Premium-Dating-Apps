@@ -1,9 +1,7 @@
 import { Response } from 'express';
-import { PrismaClient } from '../generated/prisma';
+import prisma from '../utils/prisma';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
 
 // Schemas for validation
 const updateProfileSchema = z.object({
@@ -32,7 +30,8 @@ export const ProfileController = {
       }
 
       // Exclude password from the result
-      const { password, ...userProfile } = user;
+      // Exclude passwordHash from the result
+      const { passwordHash, ...userProfile } = user;
       res.json(userProfile);
 
     } catch (error) {
@@ -51,7 +50,7 @@ export const ProfileController = {
         data,
       });
 
-      const { password, ...userProfile } = updatedUser;
+      const { passwordHash, ...userProfile } = updatedUser;
       res.json(userProfile);
 
     } catch (error) {
@@ -93,7 +92,7 @@ export const ProfileController = {
   deleteCard: async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.userId;
-      const cardId = parseInt(req.params.cardId, 10);
+      const { cardId } = req.params;
 
       const card = await prisma.conversationCard.findUnique({ where: { id: cardId } });
       if (!card || card.userId !== userId) {

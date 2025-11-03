@@ -1,8 +1,6 @@
 import { Response } from 'express';
-import { PrismaClient } from '../generated/prisma';
+import prisma from '../utils/prisma';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
-
-const prisma = new PrismaClient();
 
 export const FeedController = {
   // Get the feed of conversation cards from other users

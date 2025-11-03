@@ -27,19 +27,19 @@ enum IcebreakerStatus {
 // Models
 
 model User {
-  id              String   @id @default(cuid()) // PERBAIKAN: Menggunakan CUID, bukan Int
-  email           String   @unique
-  passwordHash    String // PERBAIKAN: Nama diubah dari 'password'
-  firstName       String
-  lastName        String
-  birthDate       DateTime
-  bio             String?
-  jobTitle        String?
-  education       String?
-  role            UserRole @default(USER)
-  focusSlotsLimit Int      @default(5)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                String   @id @default(cuid())
+  email             String   @unique
+  passwordHash      String
+  firstName         String
+  lastName          String
+  birthDate         DateTime
+  bio               String?
+  jobTitle          String?
+  education         String?
+  role              UserRole @default(USER)
+  focusSlotsLimit   Int      @default(5)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   conversationCards   ConversationCard[]
   sentIcebreakers     Icebreaker[]       @relation("SentIcebreakers")
@@ -50,43 +50,43 @@ model User {
 }
 
 model ConversationCard {
-  id         String   @id @default(cuid()) // PERBAIKAN: Menggunakan CUID
+  id         String   @id @default(cuid())
   mediaUrl   String
   promptText String
   createdAt  DateTime @default(now())
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String // PERBAIKAN: Tipe diubah ke String
+  userId String
 
   icebreakers Icebreaker[]
 }
 
 model Icebreaker {
-  id         String           @id @default(cuid()) // PERBAIKAN: Menggunakan CUID
+  id         String           @id @default(cuid())
   content    String
   status     IcebreakerStatus @default(PENDING)
   createdAt  DateTime         @default(now())
 
   sender     User   @relation("SentIcebreakers", fields: [senderId], references: [id], onDelete: Cascade)
-  senderId   String // PERBAIKAN: Tipe diubah ke String
+  senderId   String
   receiver   User   @relation("ReceivedIcebreakers", fields: [receiverId], references: [id], onDelete: Cascade)
-  receiverId String // PERBAIKAN: Tipe diubah ke String
+  receiverId String
 
   targetCard   ConversationCard @relation(fields: [targetCardId], references: [id], onDelete: Cascade)
-  targetCardId String // PERBAIKAN: Tipe diubah ke String
+  targetCardId String
 
   @@unique([senderId, receiverId, targetCardId])
 }
 
 model Match {
-  id        String   @id @default(cuid()) // PERBAIKAN: Menggunakan CUID
+  id        String   @id @default(cuid())
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
   userA   User   @relation("UserA", fields: [userAId], references: [id], onDelete: Cascade)
-  userAId String // PERBAIKAN: Tipe diubah ke String
+  userAId String
   userB   User   @relation("UserB", fields: [userBId], references: [id], onDelete: Cascade)
-  userBId String // PERBAIKAN: Tipe diubah ke String
+  userBId String
 
   messages Message[]
 
@@ -94,12 +94,12 @@ model Match {
 }
 
 model Message {
-  id        String   @id @default(cuid()) // PERBAIKAN: Menggunakan CUID
+  id        String   @id @default(cuid())
   content   String
   createdAt DateTime @default(now())
 
   match   Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  matchId String // PERBAIKAN: Tipe diubah ke String
+  matchId String
   sender  User   @relation(fields: [senderId], references: [id], onDelete: Cascade)
-  senderId String // PERBAIKAN: Tipe diubah ke String
+  senderId String
 }

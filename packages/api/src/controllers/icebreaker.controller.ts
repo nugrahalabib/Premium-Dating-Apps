@@ -1,9 +1,7 @@
 import { Response } from 'express';
-import { PrismaClient } from '../generated/prisma';
+import prisma from '../utils/prisma';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
 
 const createIcebreakerSchema = z.object({
   content: z.string().min(50),
@@ -18,7 +16,7 @@ export const IcebreakerController = {
         return res.status(401).json({ message: 'Unauthorized' });
       }
 
-      const targetCardId = parseInt(req.params.cardId, 10);
+      const { cardId: targetCardId } = req.params;
       const { content } = createIcebreakerSchema.parse(req.body);
 
       // Find the target card and its owner
@@ -90,7 +88,7 @@ export const IcebreakerController = {
   acceptIcebreaker: async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.userId;
-      const icebreakerId = parseInt(req.params.icebreakerId, 10);
+      const { icebreakerId } = req.params;
 
       const icebreaker = await prisma.icebreaker.findUnique({
         where: { id: icebreakerId },
