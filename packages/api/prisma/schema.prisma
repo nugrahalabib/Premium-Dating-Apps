@@ -27,19 +27,19 @@ enum IcebreakerStatus {
 // Models
 
 model User {
-  id                Int      @id @default(autoincrement())
-  email             String   @unique
-  password          String
-  firstName         String
-  lastName          String
-  birthDate         DateTime
-  bio               String?
-  jobTitle          String?
-  education         String?
-  role              UserRole @default(USER)
-  focusSlotsLimit   Int      @default(5)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id              String   @id @default(cuid()) // PERBAIKAN: Menggunakan CUID, bukan Int
+  email           String   @unique
+  passwordHash    String // PERBAIKAN: Nama diubah dari 'password'
+  firstName       String
+  lastName        String
+  birthDate       DateTime
+  bio             String?
+  jobTitle        String?
+  education       String?
+  role            UserRole @default(USER)
+  focusSlotsLimit Int      @default(5)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   conversationCards   ConversationCard[]
   sentIcebreakers     Icebreaker[]       @relation("SentIcebreakers")
@@ -50,43 +50,43 @@ model User {
 }
 
 model ConversationCard {
-  id         Int      @id @default(autoincrement())
+  id         String   @id @default(cuid()) // PERBAIKAN: Menggunakan CUID
   mediaUrl   String
   promptText String
   createdAt  DateTime @default(now())
 
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String // PERBAIKAN: Tipe diubah ke String
 
   icebreakers Icebreaker[]
 }
 
 model Icebreaker {
-  id         Int              @id @default(autoincrement())
+  id         String           @id @default(cuid()) // PERBAIKAN: Menggunakan CUID
   content    String
   status     IcebreakerStatus @default(PENDING)
   createdAt  DateTime         @default(now())
 
-  sender     User @relation("SentIcebreakers", fields: [senderId], references: [id], onDelete: Cascade)
-  senderId   Int
-  receiver   User @relation("ReceivedIcebreakers", fields: [receiverId], references: [id], onDelete: Cascade)
-  receiverId Int
+  sender     User   @relation("SentIcebreakers", fields: [senderId], references: [id], onDelete: Cascade)
+  senderId   String // PERBAIKAN: Tipe diubah ke String
+  receiver   User   @relation("ReceivedIcebreakers", fields: [receiverId], references: [id], onDelete: Cascade)
+  receiverId String // PERBAIKAN: Tipe diubah ke String
 
   targetCard   ConversationCard @relation(fields: [targetCardId], references: [id], onDelete: Cascade)
-  targetCardId Int
+  targetCardId String // PERBAIKAN: Tipe diubah ke String
 
   @@unique([senderId, receiverId, targetCardId])
 }
 
 model Match {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid()) // PERBAIKAN: Menggunakan CUID
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
-  userA   User @relation("UserA", fields: [userAId], references: [id], onDelete: Cascade)
-  userAId Int
-  userB   User @relation("UserB", fields: [userBId], references: [id], onDelete: Cascade)
-  userBId Int
+  userA   User   @relation("UserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userAId String // PERBAIKAN: Tipe diubah ke String
+  userB   User   @relation("UserB", fields: [userBId], references: [id], onDelete: Cascade)
+  userBId String // PERBAIKAN: Tipe diubah ke String
 
   messages Message[]
 
@@ -94,12 +94,12 @@ model Match {
 }
 
 model Message {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid()) // PERBAIKAN: Menggunakan CUID
   content   String
   createdAt DateTime @default(now())
 
-  match   Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  matchId Int
-  sender  User  @relation(fields: [senderId], references: [id], onDelete: Cascade)
-  senderId Int
+  match   Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  matchId String // PERBAIKAN: Tipe diubah ke String
+  sender  User   @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  senderId String // PERBAIKAN: Tipe diubah ke String
 }
